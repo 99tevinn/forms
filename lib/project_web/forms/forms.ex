@@ -12,7 +12,7 @@ defmodule ProjectWeb.Forms.Forms do
   def handle_params(params, _uri, socket) do
     {:noreply, apply_action(socket, socket.assigns.live_action, params)}
   end
-  
+
   def apply_action(socket, :add_person, _params) do
     changeset = socket.assigns.changeset
     assign_form(socket, changeset, "add-person")

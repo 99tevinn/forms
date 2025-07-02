@@ -15,5 +15,4 @@ defmodule ProjectWeb.Api.ApiController do
         |> json(%{status: "error", errors: errors})
     end
   end
-
 end

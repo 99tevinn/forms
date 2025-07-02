@@ -16,5 +16,6 @@ defmodule Project.Person.Forms do
     forms
     |> cast(attrs, [:name, :email, :age])
     |> validate_required([:name, :email, :age])
+    |> validate_format(:email, ~r/@/)
   end
 end
