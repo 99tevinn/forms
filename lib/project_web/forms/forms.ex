@@ -6,11 +6,18 @@ defmodule ProjectWeb.Forms.Forms do
   import Ecto.Changeset
 
   def mount(_params, _session, socket) do
-    {:ok, assign(socket, changeset: person_form(%{}) |> IO.inspect())}
+    changeset = Project.Person.Forms.changeset(%Project.Person.Forms{})
+
+    {:ok, assign(socket, changeset: changeset |> IO.inspect())}
   end
 
   def handle_params(params, _uri, socket) do
-    {:noreply, apply_action(socket, socket.assigns.live_action, params)}
+   changeset =
+    %Project.Person.Forms{}
+    |> Project.Person.Forms.changeset(params)
+    |> Map.put(:action, :validate)
+
+    {:noreply, assign(socket, changeset: changeset)}
   end
 
   def apply_action(socket, :add_person, _params) do
@@ -34,16 +41,9 @@ defmodule ProjectWeb.Forms.Forms do
   defp assign_form(socket, %Ecto.Changeset{} = changeset, form_name) do
     form = to_form(changeset, as: form_name)
 
-    if changeset.valid? do
-      assign(socket, form: form, check_errors: false, changeset: changeset)
-    else
-      assign(socket, form: form, changeset: changeset)
-    end
-  end
-
-  def person_form(params) do
-    %Project.Person.Forms{}
-    |> Project.Person.Forms.changeset(params)
-    |> Map.put(:action, :validate)
+    socket
+    |> assign(form: form)
+    |> assign(:check_errors, !changeset.valid?)
+    |> assign(changeset: changeset)
   end
 end

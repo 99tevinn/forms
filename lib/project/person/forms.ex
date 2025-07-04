@@ -15,7 +15,7 @@ defmodule Project.Person.Forms do
   def changeset(forms, attrs \\ %{}) do
     forms
     |> cast(attrs, [:name, :email, :age])
-    |> validate_required([:name, :email, :age])
-    |> validate_format(:email, ~r/@/)
+    |> validate_required([:name, :email, :age], message: "The fields are required")
+    |> validate_format(:email, ~r/@/, message: "must be a valid email")
   end
 end
