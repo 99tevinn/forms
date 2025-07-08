@@ -7,15 +7,14 @@ defmodule ProjectWeb.Forms.Forms do
 
   def mount(_params, _session, socket) do
     changeset = Project.Person.Forms.changeset(%Project.Person.Forms{})
-
-    {:ok, assign(socket, changeset: changeset |> IO.inspect())}
+    {:ok, assign(socket, changeset: changeset)}
   end
 
   def handle_params(params, _uri, socket) do
-   changeset =
-    %Project.Person.Forms{}
-    |> Project.Person.Forms.changeset(params)
-    |> Map.put(:action, :validate)
+    changeset =
+      %Project.Person.Forms{}
+      |> Project.Person.Forms.changeset(params)
+      |> Map.put(:action, :validate)
 
     {:noreply, assign(socket, changeset: changeset)}
   end
@@ -26,12 +25,17 @@ defmodule ProjectWeb.Forms.Forms do
   end
 
   def handle_event("create-user", params, socket) do
-    new_params = params |> Jason.encode!() |> Jason.decode!()
-    {:ok, person} = Persons.create_user(new_params)
+    case Persons.create_user(params) do
+      {:ok, person} ->
+        {:noreply,
+         socket
+         |> assign(person: person)
+         |> put_flash(:info, "User added Successfully")
+         |> push_navigate(to: ~p"/add-person")}
 
-   {:noreply, assign(socket, person: person)
-    |> put_flash(:info, "User added Successfully")
-    |> push_navigate(to: ~p(/add-person))}
+      {:error, changeset} ->
+        {:noreply, assign(socket, changeset: changeset)}
+    end
   end
 
   def handle_event("Validate-user", _params, socket) do
